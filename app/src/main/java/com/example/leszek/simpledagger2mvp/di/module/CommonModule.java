@@ -1,14 +1,14 @@
-package com.example.leszek.simpledagger2mvp.dagger.module;
+package com.example.leszek.simpledagger2mvp.di.module;
 
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.example.ti_mvp_sample.dagger.qualifier.AuthenticationInterceptor;
-import com.example.ti_mvp_sample.dagger.qualifier.CachedOkHttpClient;
-import com.example.ti_mvp_sample.dagger.qualifier.CachedRetrofit;
-import com.example.ti_mvp_sample.dagger.qualifier.NonCachedOkHttpClient;
-import com.example.ti_mvp_sample.dagger.qualifier.NonCachedRetrofit;
+import com.example.leszek.simpledagger2mvp.di.qualifier.AuthenticationInterceptor;
+import com.example.leszek.simpledagger2mvp.di.qualifier.CachedOkHttpClient;
+import com.example.leszek.simpledagger2mvp.di.qualifier.CachedRetrofit;
+import com.example.leszek.simpledagger2mvp.di.qualifier.NonCachedOkHttpClient;
+import com.example.leszek.simpledagger2mvp.di.qualifier.NonCachedRetrofit;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;

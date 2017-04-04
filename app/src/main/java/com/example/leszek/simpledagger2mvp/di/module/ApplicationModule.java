@@ -1,10 +1,10 @@
-package com.example.leszek.simpledagger2mvp.dagger.module;
+package com.example.leszek.simpledagger2mvp.di.module;
 
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.ti_mvp_sample.TiMvpSampleApplication;
+import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
 
 import javax.inject.Singleton;
 
@@ -28,8 +28,8 @@ public final class ApplicationModule {
 
     @Provides
     @Singleton
-    public TiMvpSampleApplication provideTiMvpSampleApplication() {
-        return (TiMvpSampleApplication) application;
+    public SimpleDagger2MvpApplication provideSimpleDagger2MvpApplication() {
+        return (SimpleDagger2MvpApplication) application;
     }
 
     @Provides
