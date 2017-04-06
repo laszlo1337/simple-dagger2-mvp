@@ -1,21 +1,88 @@
 package com.example.leszek.simpledagger2mvp.presentation.users;
 
 import android.os.Bundle;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.example.leszek.simpledagger2mvp.R;
+import android.widget.Toast;
 
-public class UsersActivity extends AppCompatActivity implements UsersView {
+import com.example.leszek.simpledagger2mvp.R;
+import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
+import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
+import com.example.leszek.simpledagger2mvp.domain.model.User;
+import com.example.leszek.simpledagger2mvp.presentation.users.adapter.EndlessRecyclerOnScrollListener;
+import com.example.leszek.simpledagger2mvp.presentation.users.adapter.UsersListAdapter;
+import com.example.leszek.simpledagger2mvp.presentation.users.di.DaggerUsersComponent;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class UsersActivity extends AppCompatActivity implements UsersView, EndlessRecyclerOnScrollListener.OnLoadMoreListener {
+    @Inject
+    UsersPresenter presenter;
+    @BindView(R.id.bar_progress)
+    ContentLoadingProgressBar progressBar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.layout_coordinator)
+    CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerView;
+
+    private UsersListAdapter adapter;
+
+
+
+    @Override
+    public void onLoadMore() {
+        progressBar.show();
+        presenter.loadMore();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
+    }
+
+    @Override
+    public void updateUsers(List<UserModel> users) {
+        adapter.update(users);
+        progressBar.hide();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication)getApplication()).getApplicationComponent();
+        DaggerUsersComponent.builder()
+                .applicationComponent(applicationComponent)
+                .build()
+                .injectTo(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
+        adapter = new UsersListAdapter();
+        recyclerView.setAdapter(adapter);
+        EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager)recyclerView.getLayoutManager(),this);
+        recyclerView.addOnScrollListener(endlessScrollListener);
+
+
+        presenter.attachView(new WeakReference<>(this).get());
 
     }
 
@@ -39,5 +106,11 @@ public class UsersActivity extends AppCompatActivity implements UsersView {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void showErrorMessage() {
+        Snackbar.make(coordinatorLayout, R.string.error_message, BaseTransientBottomBar.LENGTH_LONG).show();
     }
 }

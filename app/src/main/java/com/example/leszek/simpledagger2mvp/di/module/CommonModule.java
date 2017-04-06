@@ -48,8 +48,7 @@ public final class CommonModule {
     @Provides
     @Singleton
     Cache provideOkHttpCache(Application application) {
-        int cacheSize = CACHE_SIZE;
-        return new Cache(application.getCacheDir(), cacheSize);
+        return new Cache(application.getCacheDir(), CACHE_SIZE);
     }
 
     @Provides

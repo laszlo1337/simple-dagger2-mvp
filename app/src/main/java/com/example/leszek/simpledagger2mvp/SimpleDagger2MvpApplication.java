@@ -8,6 +8,9 @@ import com.example.leszek.simpledagger2mvp.di.component.DaggerApplicationCompone
 import com.example.leszek.simpledagger2mvp.di.module.ApplicationModule;
 import com.example.leszek.simpledagger2mvp.di.module.CommonModule;
 
+import timber.log.Timber;
+
+
 public class SimpleDagger2MvpApplication extends Application {
 
     private ApplicationComponent applicationComponent;
@@ -20,6 +23,8 @@ public class SimpleDagger2MvpApplication extends Application {
                 .applicationModule(new ApplicationModule(this))
                 .commonModule(new CommonModule("https://api.github.com/"))
                 .build();
+
+        Timber.plant(new Timber.DebugTree());
     }
 
 

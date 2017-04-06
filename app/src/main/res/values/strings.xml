@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SimpleDagger2Mvp</string>
     <string name="action_settings">Settings</string>
+    <string name="error_message">Couldn\'t load users</string>
 </resources>

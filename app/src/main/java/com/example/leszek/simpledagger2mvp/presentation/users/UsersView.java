@@ -1,8 +1,12 @@
 package com.example.leszek.simpledagger2mvp.presentation.users;
 
-/**
- * Created by Leszek on 04.04.2017.
- */
+import com.example.leszek.simpledagger2mvp.domain.model.User;
+
+import java.util.List;
+
+
 
 public interface UsersView {
+    void updateUsers(List<UserModel> users);
+    void showErrorMessage();
 }
