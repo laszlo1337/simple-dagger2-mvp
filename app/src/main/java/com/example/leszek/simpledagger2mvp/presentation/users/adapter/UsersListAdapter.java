@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.leszek.simpledagger2mvp.R;
 import com.example.leszek.simpledagger2mvp.domain.model.User;
 import com.example.leszek.simpledagger2mvp.presentation.users.UserModel;
+import com.example.leszek.simpledagger2mvp.presentation.users.UsersView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import butterknife.ButterKnife;
 
 public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.UserViewHolder> {
 
+    UsersView usersView;
     private List<UserModel> users;
     private int lastPosition;
 
@@ -44,6 +46,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
         Glide.with(holder.avatar.getContext()).load(user.getAvatarUrl()).into(holder.avatar);
         holder.login.setText(user.getLogin());
         holder.id.setText(String.valueOf(user.getId()));
+        holder.item.setOnClickListener(v -> usersView.onClickListItem(user.getLogin()));
     }
 
     @Override
@@ -75,10 +78,17 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
         TextView login;
         @BindView(R.id.user_id)
         TextView id;
+        View item;
 
         public UserViewHolder(View view) {
             super(view);
+            item = view;
             ButterKnife.bind(this, view);
         }
     }
+
+    public void setOnClickListener(UsersView usersView){
+        this.usersView = usersView;
+    }
+
 }

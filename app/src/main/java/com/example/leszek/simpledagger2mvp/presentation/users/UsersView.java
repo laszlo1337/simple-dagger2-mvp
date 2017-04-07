@@ -9,4 +9,5 @@ import java.util.List;
 public interface UsersView {
     void updateUsers(List<UserModel> users);
     void showErrorMessage();
+    void onClickListItem(String name);
 }

@@ -6,24 +6,17 @@ import com.example.leszek.simpledagger2mvp.domain.api.GithubInterface;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
-import io.requery.query.Scalar;
-import timber.log.Timber;
 
 
 public class UsersPresenter {
 
-    public static int USER_QUANTITY_PER_CALL = 16;
+    private final static int USER_QUANTITY_PER_CALL = 16;
 
     private CompositeDisposable compositeDisposable;
     private GithubInterface githubInterface;
-
     private int lastUserId;
 
     @Nullable
@@ -66,9 +59,7 @@ public class UsersPresenter {
                         view.showErrorMessage();
                     }
                 }));
-
     }
-
 
 
 }

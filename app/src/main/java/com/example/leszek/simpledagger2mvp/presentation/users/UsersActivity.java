@@ -1,5 +1,6 @@
 package com.example.leszek.simpledagger2mvp.presentation.users;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
@@ -11,12 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.leszek.simpledagger2mvp.R;
 import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
 import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
-import com.example.leszek.simpledagger2mvp.domain.model.User;
+import com.example.leszek.simpledagger2mvp.presentation.userdetails.UserDetailsActivity;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.EndlessRecyclerOnScrollListener;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.UsersListAdapter;
 import com.example.leszek.simpledagger2mvp.presentation.users.di.DaggerUsersComponent;
@@ -28,6 +28,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.example.leszek.simpledagger2mvp.common.BundleKey.KEY_USER_LOGIN;
 
 public class UsersActivity extends AppCompatActivity implements UsersView, EndlessRecyclerOnScrollListener.OnLoadMoreListener {
     @Inject
@@ -77,6 +79,7 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         setSupportActionBar(toolbar);
 
         adapter = new UsersListAdapter();
+        adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
         EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager)recyclerView.getLayoutManager(),this);
         recyclerView.addOnScrollListener(endlessScrollListener);
@@ -112,5 +115,12 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     @Override
     public void showErrorMessage() {
         Snackbar.make(coordinatorLayout, R.string.error_message, BaseTransientBottomBar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClickListItem(String name) {
+        Intent intent = new Intent(this, UserDetailsActivity.class);
+        intent.putExtra(KEY_USER_LOGIN, name);
+        startActivity(intent);
     }
 }
