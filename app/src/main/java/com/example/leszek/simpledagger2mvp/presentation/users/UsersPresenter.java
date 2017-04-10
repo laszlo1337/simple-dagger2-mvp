@@ -3,6 +3,7 @@ package com.example.leszek.simpledagger2mvp.presentation.users;
 import android.support.annotation.Nullable;
 
 import com.example.leszek.simpledagger2mvp.domain.api.GithubInterface;
+import com.example.leszek.simpledagger2mvp.domain.model.UserSearchResult;
 
 import javax.inject.Inject;
 
@@ -18,6 +19,11 @@ public class UsersPresenter {
     private CompositeDisposable compositeDisposable;
     private GithubInterface githubInterface;
     private int lastUserId;
+    private int lastPage;
+    private boolean isSearchViewSelected;
+
+    private String query;
+
 
     @Nullable
     UsersView view;
@@ -30,16 +36,20 @@ public class UsersPresenter {
 
     public void attachView(UsersView usersView) {
         this.view = usersView;
-        getUsers(0);
+
     }
 
     public void detachView() {
         this.view = null;
-        this.compositeDisposable.clear();
+        this.compositeDisposable.dispose();
     }
 
     public void loadMore() {
-        getUsers(lastUserId);
+        if(isSearchViewSelected){
+
+        } else {
+            getUsers(lastUserId);
+        }
     }
 
     public void getUsers(int lastUserId) {
@@ -61,5 +71,27 @@ public class UsersPresenter {
                 }));
     }
 
+    public void searchUsers(String searchedLogin) {
+        compositeDisposable.add(githubInterface.searchUsers(searchedLogin, 100)
+                .subscribeOn(Schedulers.io())
+                .flatMapIterable(UserSearchResult::getItems)
+                .map(user -> new UserModel(user.getId(), user.getLogin(), user.getAvatarUrl()))
+                .toList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userModels -> {
+                    if (view != null) {
+                        view.setUsers(userModels);
+                    }
+                }, e -> {
+                    if (view != null) {
+                        view.showErrorMessage();
+                    }
+                }));
 
+    }
+
+
+    public void searchViewSelected(boolean b) {
+        this.isSearchViewSelected = b;
+    }
 }

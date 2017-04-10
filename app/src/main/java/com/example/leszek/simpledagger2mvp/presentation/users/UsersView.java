@@ -7,6 +7,7 @@ import java.util.List;
 
 
 public interface UsersView {
+    void setUsers(List<UserModel> users);
     void updateUsers(List<UserModel> users);
     void showErrorMessage();
     void onClickListItem(String name);

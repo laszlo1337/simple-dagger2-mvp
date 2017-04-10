@@ -5,29 +5,38 @@ import android.os.Bundle;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.leszek.simpledagger2mvp.R;
 import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
 import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
+import com.example.leszek.simpledagger2mvp.domain.model.User;
 import com.example.leszek.simpledagger2mvp.presentation.userdetails.UserDetailsActivity;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.EndlessRecyclerOnScrollListener;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.UsersListAdapter;
 import com.example.leszek.simpledagger2mvp.presentation.users.di.DaggerUsersComponent;
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.example.leszek.simpledagger2mvp.common.BundleKey.KEY_USER_LOGIN;
 
@@ -46,7 +55,6 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     private UsersListAdapter adapter;
 
 
-
     @Override
     public void onLoadMore() {
         progressBar.show();
@@ -59,6 +67,13 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         presenter.detachView();
     }
 
+
+    @Override
+    public void setUsers(List<UserModel> users) {
+        adapter.setUsers(users);
+        progressBar.hide();
+    }
+
     @Override
     public void updateUsers(List<UserModel> users) {
         adapter.update(users);
@@ -67,13 +82,12 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication)getApplication()).getApplicationComponent();
         DaggerUsersComponent.builder()
                 .applicationComponent(applicationComponent)
                 .build()
                 .injectTo(this);
-
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -91,20 +105,39 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView)menuItem.getActionView();
+        searchView.setQueryHint(getString(R.string.search_query_hint));
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Toast.makeText(getApplication(),"OPENED",Toast.LENGTH_SHORT).show();
+                presenter.searchViewSelected(true);
+                RxSearchView.queryTextChanges(searchView)
+                        .filter(charSequence ->
+                        !TextUtils.isEmpty(charSequence))
+                        .debounce(1000, TimeUnit.MILLISECONDS)
+                        .subscribe( searchedLogin -> presenter.searchUsers(searchedLogin.toString()));
+
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Toast.makeText(getApplication(),"CLOSED",Toast.LENGTH_SHORT).show();
+                presenter.searchViewSelected(false);
+                return true;
+            }
+        });
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
 
@@ -114,7 +147,7 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
 
     @Override
     public void showErrorMessage() {
-        Snackbar.make(coordinatorLayout, R.string.error_message, BaseTransientBottomBar.LENGTH_LONG).show();
+        Snackbar.make(coordinatorLayout, R.string.error_message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
