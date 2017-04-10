@@ -54,9 +54,11 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
         return users.size();
     }
 
+
     public void setUsers(List<UserModel> users) {
         if (users != null) {
-            this.users = users;
+            this.users.clear();
+            this.users.addAll(users);
             this.lastPosition = users.size();
             notifyDataSetChanged();
         }
@@ -68,6 +70,11 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
             notifyItemRangeInserted(lastPosition, users.size());
             lastPosition = this.users.size();
         }
+    }
+
+    public void clearUsers() {
+        users.clear();
+        notifyDataSetChanged();
     }
 
     static class UserViewHolder extends RecyclerView.ViewHolder {

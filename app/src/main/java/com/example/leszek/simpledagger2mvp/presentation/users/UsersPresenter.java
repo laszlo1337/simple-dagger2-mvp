@@ -14,16 +14,15 @@ import io.reactivex.schedulers.Schedulers;
 
 public class UsersPresenter {
 
-    private final static int USER_QUANTITY_PER_CALL = 16;
+    private final static int USER_QUANTITY_PER_CALL = 30;
+    private final static int USER_QUANTITY_PER_SEARCH = 100;
 
     private CompositeDisposable compositeDisposable;
     private GithubInterface githubInterface;
     private int lastUserId;
-    private int lastPage;
     private boolean isSearchViewSelected;
 
     private String query;
-
 
     @Nullable
     UsersView view;
@@ -36,7 +35,7 @@ public class UsersPresenter {
 
     public void attachView(UsersView usersView) {
         this.view = usersView;
-
+        getUsers(0);
     }
 
     public void detachView() {
@@ -45,9 +44,7 @@ public class UsersPresenter {
     }
 
     public void loadMore() {
-        if(isSearchViewSelected){
-
-        } else {
+        if(!isSearchViewSelected){
             getUsers(lastUserId);
         }
     }
@@ -72,7 +69,7 @@ public class UsersPresenter {
     }
 
     public void searchUsers(String searchedLogin) {
-        compositeDisposable.add(githubInterface.searchUsers(searchedLogin, 100)
+        compositeDisposable.add(githubInterface.searchUsers(searchedLogin, USER_QUANTITY_PER_SEARCH)
                 .subscribeOn(Schedulers.io())
                 .flatMapIterable(UserSearchResult::getItems)
                 .map(user -> new UserModel(user.getId(), user.getLogin(), user.getAvatarUrl()))
@@ -87,11 +84,22 @@ public class UsersPresenter {
                         view.showErrorMessage();
                     }
                 }));
-
     }
 
+    public void searchViewSelected(boolean selected) {
+        this.isSearchViewSelected = selected;
+        lastUserId = 0;
+        if(selected){
+            searchUsers(query);
+        } else {
+            if (view != null) {
+                view.clearUsers();
+            }
+            getUsers(lastUserId);
+        }
+    }
 
-    public void searchViewSelected(boolean b) {
-        this.isSearchViewSelected = b;
+    public void setQuery(String s) {
+        query = s;
     }
 }

@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.leszek.simpledagger2mvp.R;
@@ -28,6 +29,7 @@ import com.example.leszek.simpledagger2mvp.presentation.users.di.DaggerUsersComp
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -53,11 +55,14 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     RecyclerView recyclerView;
 
     private UsersListAdapter adapter;
+    private boolean progressBarHidden;
 
 
     @Override
     public void onLoadMore() {
-        progressBar.show();
+        if (!progressBarHidden) {
+            progressBar.show();
+        }
         presenter.loadMore();
     }
 
@@ -71,7 +76,6 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     @Override
     public void setUsers(List<UserModel> users) {
         adapter.setUsers(users);
-        progressBar.hide();
     }
 
     @Override
@@ -81,9 +85,14 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     }
 
     @Override
+    public void clearUsers() {
+        adapter.clearUsers();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication)getApplication()).getApplicationComponent();
+        ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication) getApplication()).getApplicationComponent();
         DaggerUsersComponent.builder()
                 .applicationComponent(applicationComponent)
                 .build()
@@ -95,9 +104,8 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         adapter = new UsersListAdapter();
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
-        EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager)recyclerView.getLayoutManager(),this);
+        EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(), this);
         recyclerView.addOnScrollListener(endlessScrollListener);
-
 
         presenter.attachView(new WeakReference<>(this).get());
 
@@ -107,26 +115,29 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView)menuItem.getActionView();
+        SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setQueryHint(getString(R.string.search_query_hint));
         MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                Toast.makeText(getApplication(),"OPENED",Toast.LENGTH_SHORT).show();
-                presenter.searchViewSelected(true);
+                Toast.makeText(getApplication(), "OPENED", Toast.LENGTH_SHORT).show();
                 RxSearchView.queryTextChanges(searchView)
-                        .filter(charSequence ->
-                        !TextUtils.isEmpty(charSequence))
+                        .filter(charSequence -> !TextUtils.isEmpty(charSequence))
                         .debounce(1000, TimeUnit.MILLISECONDS)
-                        .subscribe( searchedLogin -> presenter.searchUsers(searchedLogin.toString()));
+                        .subscribe(searchedLogin -> {
+                            presenter.setQuery(searchedLogin.toString());
+                            presenter.searchViewSelected(true);
+                        });
 
+                progressBarHidden = true;
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                Toast.makeText(getApplication(),"CLOSED",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), "CLOSED", Toast.LENGTH_SHORT).show();
                 presenter.searchViewSelected(false);
+                progressBarHidden = false;
                 return true;
             }
         });
