@@ -54,7 +54,6 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
         return users.size();
     }
 
-
     public void setUsers(List<UserModel> users) {
         if (users != null) {
             this.users.clear();

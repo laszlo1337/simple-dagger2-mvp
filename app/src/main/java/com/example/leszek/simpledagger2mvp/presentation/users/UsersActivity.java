@@ -56,7 +56,7 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
 
     private UsersListAdapter adapter;
     private boolean progressBarHidden;
-
+    private EndlessRecyclerOnScrollListener endlessScrollListener;
 
     @Override
     public void onLoadMore() {
@@ -104,7 +104,7 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         adapter = new UsersListAdapter();
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
-        EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(), this);
+        endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(), this);
         recyclerView.addOnScrollListener(endlessScrollListener);
 
         presenter.attachView(new WeakReference<>(this).get());
@@ -123,19 +123,18 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
                 Toast.makeText(getApplication(), "OPENED", Toast.LENGTH_SHORT).show();
                 RxSearchView.queryTextChanges(searchView)
                         .filter(charSequence -> !TextUtils.isEmpty(charSequence))
-                        .debounce(1000, TimeUnit.MILLISECONDS)
+                        .debounce(500, TimeUnit.MILLISECONDS)
                         .subscribe(searchedLogin -> {
                             presenter.setQuery(searchedLogin.toString());
                             presenter.searchViewSelected(true);
                         });
-
                 progressBarHidden = true;
                 return true;
             }
-
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 Toast.makeText(getApplication(), "CLOSED", Toast.LENGTH_SHORT).show();
+                endlessScrollListener.reset(0,true);
                 presenter.searchViewSelected(false);
                 progressBarHidden = false;
                 return true;
