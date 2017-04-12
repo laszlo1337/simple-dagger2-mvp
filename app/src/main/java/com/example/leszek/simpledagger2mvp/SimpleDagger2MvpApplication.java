@@ -2,6 +2,7 @@ package com.example.leszek.simpledagger2mvp;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDexApplication;
 
 import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
 import com.example.leszek.simpledagger2mvp.di.component.DaggerApplicationComponent;
@@ -11,7 +12,7 @@ import com.example.leszek.simpledagger2mvp.di.module.CommonModule;
 import timber.log.Timber;
 
 
-public class SimpleDagger2MvpApplication extends Application {
+public class SimpleDagger2MvpApplication extends MultiDexApplication {
 
     private ApplicationComponent applicationComponent;
 

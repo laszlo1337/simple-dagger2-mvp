@@ -29,7 +29,7 @@ public class UserDetailsPresenter {
         getUserDetails(userLogin);
     }
 
-    public void detachView(){
+    public void detachView() {
         this.compositeDisposable.dispose();
         this.userDetailsView = null;
     }
@@ -37,11 +37,9 @@ public class UserDetailsPresenter {
     public void getUserDetails(String userLogin) {
         compositeDisposable.add(githubInterface.getUserDetails(userLogin)
                 .subscribeOn(Schedulers.io())
-                .map(user -> new UserDetailsModel(user.getLogin(), user.getId(), user.getAvatarUrl()))
+                .map(UserDetailsModel::new)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userDetailsModel ->
-                                userDetailsView.setUserDetails(userDetailsModel),
-                        throwable ->
-                                userDetailsView.showErrorMessage()));
+                .subscribe(userDetailsModel -> userDetailsView.setUserDetails(userDetailsModel),
+                        throwable -> userDetailsView.showErrorMessage()));
     }
 }

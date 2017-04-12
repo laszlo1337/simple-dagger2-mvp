@@ -79,7 +79,7 @@ public class UserDetails implements Serializable
     @JsonProperty("name")
     private String name;
     @JsonProperty("company")
-    private Object company;
+    private String company;
     @JsonProperty("blog")
     private String blog;
     @JsonProperty("location")
@@ -87,9 +87,9 @@ public class UserDetails implements Serializable
     @JsonProperty("email")
     private String email;
     @JsonProperty("hireable")
-    private Object hireable;
+    private boolean hireable;
     @JsonProperty("bio")
-    private Object bio;
+    private String bio;
     @JsonProperty("public_repos")
     private int publicRepos;
     @JsonProperty("public_gists")
@@ -144,7 +144,7 @@ public class UserDetails implements Serializable
      * @param company
      * @param organizationsUrl
      */
-    public UserDetails(String login, int id, String avatarUrl, String gravatarId, String url, String htmlUrl, String followersUrl, String followingUrl, String gistsUrl, String starredUrl, String subscriptionsUrl, String organizationsUrl, String reposUrl, String eventsUrl, String receivedEventsUrl, String type, boolean siteAdmin, String name, Object company, String blog, String location, String email, Object hireable, Object bio, int publicRepos, int publicGists, int followers, int following, String createdAt, String updatedAt) {
+    public UserDetails(String login, int id, String avatarUrl, String gravatarId, String url, String htmlUrl, String followersUrl, String followingUrl, String gistsUrl, String starredUrl, String subscriptionsUrl, String organizationsUrl, String reposUrl, String eventsUrl, String receivedEventsUrl, String type, boolean siteAdmin, String name, String company, String blog, String location, String email, boolean hireable, String bio, int publicRepos, int publicGists, int followers, int following, String createdAt, String updatedAt) {
         super();
         this.login = login;
         this.id = id;
@@ -359,12 +359,12 @@ public class UserDetails implements Serializable
     }
 
     @JsonProperty("company")
-    public Object getCompany() {
+    public String getCompany() {
         return company;
     }
 
     @JsonProperty("company")
-    public void setCompany(Object company) {
+    public void setCompany(String company) {
         this.company = company;
     }
 
@@ -399,22 +399,22 @@ public class UserDetails implements Serializable
     }
 
     @JsonProperty("hireable")
-    public Object getHireable() {
+    public boolean isHireable() {
         return hireable;
     }
 
     @JsonProperty("hireable")
-    public void setHireable(Object hireable) {
+    public void setHireable(boolean hireable) {
         this.hireable = hireable;
     }
 
     @JsonProperty("bio")
-    public Object getBio() {
+    public String getBio() {
         return bio;
     }
 
     @JsonProperty("bio")
-    public void setBio(Object bio) {
+    public void setBio(String bio) {
         this.bio = bio;
     }
 

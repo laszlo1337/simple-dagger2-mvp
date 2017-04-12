@@ -9,7 +9,7 @@ android {
         applicationId "com.example.leszek.simpledagger2mvp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
 
@@ -27,12 +27,11 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled false
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
         release {
+            shrinkResources true
             minifyEnabled true
             useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -55,10 +54,12 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:multidex:1.0.1'
 
+    compile 'com.google.android.gms:play-services-maps:10.2.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.jakewharton.rxbinding2:rxbinding-appcompat-v7:2.0.0'
-
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     //
     // Android support
@@ -118,20 +119,6 @@ dependencies {
     compile "io.requery:requery-android:$rootProject.ext.requeryVersion"
     apt "io.requery:requery-processor:$rootProject.ext.requeryVersion"
 
-    //
-    // ThirtyInch
-    compile "net.grandcentrix.thirtyinch:thirtyinch:$rootProject.ext.thirtyInchVersion"
-
-    //
-    // EventBus
-    compile "org.greenrobot:eventbus:$rootProject.ext.eventBusVersion"
-
-    //
-    // LeakCanary
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leakCanaryVersion"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakCanaryVersion"
-    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakCanaryVersion"
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
     //                                       TESTING STUFF                                        //
@@ -172,7 +159,5 @@ dependencies {
 
     androidTestCompile "com.google.dexmaker:dexmaker:$rootProject.ext.dexmakerVersion"
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:$rootProject.ext.dexmakerVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
 }

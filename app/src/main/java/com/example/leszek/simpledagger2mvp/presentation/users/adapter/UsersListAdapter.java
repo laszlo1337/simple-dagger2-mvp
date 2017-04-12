@@ -6,11 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.leszek.simpledagger2mvp.R;
-import com.example.leszek.simpledagger2mvp.domain.model.User;
 import com.example.leszek.simpledagger2mvp.presentation.users.UserModel;
 import com.example.leszek.simpledagger2mvp.presentation.users.UsersView;
 
@@ -36,7 +34,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
 
     @Override
     public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_element, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_element_user, parent, false);
         return new UserViewHolder(view);
     }
 

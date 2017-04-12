@@ -5,4 +5,7 @@
     <string name="title_activity_user_details">UserDetailsActivity</string>
     <string name="userdetails_error_message">Couldn\'t load user details</string>
     <string name="search_query_hint">Type user name...</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

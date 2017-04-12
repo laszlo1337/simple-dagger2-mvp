@@ -16,6 +16,8 @@
 #   public *;
 #}
 
+-keep class com.example.leszek.simpledagger2mvp.** { *; }
+
 # Some methods are only called from tests, so make sure the shrinker keeps them.
 -keep class com.example.android.architecture.blueprints.** { *; }
 
@@ -51,3 +53,38 @@
 
 # retro lambda
 -dontwarn java.lang.invoke.*
+
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontnote okhttp3.**
+
+-dontwarn java.lang.invoke.*
+
+
+# Okio
+-keep class sun.misc.Unsafe { *; }
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
