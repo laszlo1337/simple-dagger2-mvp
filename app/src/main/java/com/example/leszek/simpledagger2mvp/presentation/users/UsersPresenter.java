@@ -1,46 +1,50 @@
 package com.example.leszek.simpledagger2mvp.presentation.users;
 
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.example.leszek.simpledagger2mvp.domain.api.GithubInterface;
+import com.example.leszek.simpledagger2mvp.domain.model.User;
 import com.example.leszek.simpledagger2mvp.domain.model.UserSearchResult;
+import com.example.leszek.simpledagger2mvp.presentation.base.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class UsersPresenter {
+public class UsersPresenter extends BasePresenter<UsersView> {
 
     private final static int USER_QUANTITY_PER_CALL = 30;
     private final static int USER_QUANTITY_PER_SEARCH = 100;
 
-    private CompositeDisposable compositeDisposable;
     private GithubInterface githubInterface;
+    private String query;
+    private List<UserModel> users;
     private int lastUserId;
     private boolean isSearchViewSelected;
-
-    private String query;
-
-    @Nullable
-    UsersView view;
 
     @Inject
     public UsersPresenter(GithubInterface githubInterface) {
         this.githubInterface = githubInterface;
-        this.compositeDisposable = new CompositeDisposable();
     }
 
-    public void attachView(UsersView usersView) {
-        this.view = usersView;
-        getUsers(0);
-    }
-
-    public void detachView() {
-        this.view = null;
-        this.compositeDisposable.dispose();
+    @Override
+    protected void activityCreated(Bundle bundle) {
+        if (users == null){
+            users = new ArrayList<>();
+            getUsers(0);
+        } else {
+            if (getView() != null) {
+                getView().setUsers(users);
+            }
+        }
     }
 
     public void loadMore() {
@@ -50,6 +54,7 @@ public class UsersPresenter {
     }
 
     public void getUsers(int lastUserId) {
+        compositeDisposable.clear();
         compositeDisposable.add(githubInterface.getUsers(USER_QUANTITY_PER_CALL, lastUserId)
                 .subscribeOn(Schedulers.io())
                 .flatMapIterable(users -> users)
@@ -57,13 +62,14 @@ public class UsersPresenter {
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(users -> {
-                    if (view != null) {
+                    if (getView() != null) {
+                        this.users.addAll(users);
                         this.lastUserId = users.get(users.size() - 1).getId();
-                        view.updateUsers(users);
+                        getView().updateUsers(users);
                     }
                 }, e -> {
-                    if (view != null) {
-                        view.showErrorMessage();
+                    if (getView() != null) {
+                        getView().showErrorMessage();
                     }
                 }));
     }
@@ -76,12 +82,12 @@ public class UsersPresenter {
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(userModels -> {
-                    if (view != null) {
-                        view.setUsers(userModels);
+                    if (getView() != null) {
+                        getView().setUsers(userModels);
                     }
                 }, e -> {
-                    if (view != null) {
-                        view.showErrorMessage();
+                    if (getView() != null) {
+                        getView().showErrorMessage();
                     }
                 }));
     }
@@ -92,8 +98,8 @@ public class UsersPresenter {
         if(selected){
             searchUsers(query);
         } else {
-            if (view != null) {
-                view.clearUsers();
+            if (getView() != null) {
+                getView().clearUsers();
             }
             getUsers(lastUserId);
         }

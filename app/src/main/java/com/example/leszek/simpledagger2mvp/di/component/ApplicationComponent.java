@@ -13,6 +13,7 @@ import com.example.leszek.simpledagger2mvp.di.qualifier.CachedOkHttpClient;
 import com.example.leszek.simpledagger2mvp.di.qualifier.CachedRetrofit;
 import com.example.leszek.simpledagger2mvp.di.qualifier.NonCachedOkHttpClient;
 import com.example.leszek.simpledagger2mvp.di.qualifier.NonCachedRetrofit;
+import com.example.leszek.simpledagger2mvp.presentation.base.PresenterCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.inject.Singleton;
@@ -28,6 +29,8 @@ import retrofit2.Retrofit;
 public interface ApplicationComponent {
 
     Context context();
+
+    PresenterCache presenterCache();
 
     SimpleDagger2MvpApplication simpleDagger2MvpApplication();
 

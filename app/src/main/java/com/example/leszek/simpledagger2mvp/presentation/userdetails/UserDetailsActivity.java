@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,9 +14,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.leszek.simpledagger2mvp.R;
-import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
-import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
+import com.example.leszek.simpledagger2mvp.presentation.base.BaseActivity;
 import com.example.leszek.simpledagger2mvp.presentation.userdetails.di.DaggerUserDetailsComponent;
+import com.example.leszek.simpledagger2mvp.presentation.userdetails.di.UserDetailsComponent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,7 +28,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,14 +35,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.example.leszek.simpledagger2mvp.common.BundleKey.KEY_USER_LOGIN;
 
-public class UserDetailsActivity extends AppCompatActivity implements UserDetailsView, OnMapReadyCallback {
+public class UserDetailsActivity extends BaseActivity<UserDetailsPresenter> implements UserDetailsView, OnMapReadyCallback {
 
     @BindView(R.id.userdetails_toolbar)
     Toolbar toolbar;
@@ -91,37 +85,19 @@ public class UserDetailsActivity extends AppCompatActivity implements UserDetail
     TextView followers;
 
 
-    @Inject
-    UserDetailsPresenter presenter;
-
     SupportMapFragment mapFragment;
     Geocoder geocoder;
     String cityName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication) getApplication()).getApplicationComponent();
-        DaggerUserDetailsComponent.builder()
-                .applicationComponent(applicationComponent)
-                .build()
-                .injectTo(this);
+    protected int layoutResId() {
+        return R.layout.activity_user_details;
+    }
 
-        setContentView(R.layout.activity_user_details);
-        ButterKnife.bind(this);
-
-
-        setSupportActionBar(toolbar);
-        String login = getIntent().getStringExtra(KEY_USER_LOGIN);
-        presenter.attachView(this, login);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(login);
-        toolbar.setNavigationOnClickListener(v -> finish());
-
-
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.userdetails_map);
-        geocoder = new Geocoder(this);
+    @Override
+    protected void inject() {
+        presenterComponent = DaggerUserDetailsComponent.builder().applicationComponent(getApplicationComponent()).build();
+        ((UserDetailsComponent) presenterComponent).injectTo(this);
     }
 
     @Override
@@ -219,5 +195,20 @@ public class UserDetailsActivity extends AppCompatActivity implements UserDetail
 
     public void setVisible(View v){
         v.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void created() {
+        setSupportActionBar(toolbar);
+        String login = getIntent().getStringExtra(KEY_USER_LOGIN);
+        presenter.attachView(this, login);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(login);
+        toolbar.setNavigationOnClickListener(v -> finish());
+
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.userdetails_map);
+        geocoder = new Geocoder(this);
     }
 }

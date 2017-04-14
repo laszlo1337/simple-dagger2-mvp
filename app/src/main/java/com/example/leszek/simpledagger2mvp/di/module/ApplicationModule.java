@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
+import com.example.leszek.simpledagger2mvp.presentation.base.PresenterCache;
 
 import javax.inject.Singleton;
 
@@ -36,5 +37,11 @@ public final class ApplicationModule {
     @Singleton
     public Application provideApplication() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    PresenterCache providePresenterProvider() {
+        return new PresenterCache();
     }
 }

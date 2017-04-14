@@ -1,12 +1,10 @@
 package com.example.leszek.simpledagger2mvp.presentation.users;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,26 +15,24 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.leszek.simpledagger2mvp.R;
-import com.example.leszek.simpledagger2mvp.SimpleDagger2MvpApplication;
-import com.example.leszek.simpledagger2mvp.di.component.ApplicationComponent;
+import com.example.leszek.simpledagger2mvp.presentation.base.BaseActivity;
 import com.example.leszek.simpledagger2mvp.presentation.userdetails.UserDetailsActivity;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.EndlessRecyclerOnScrollListener;
 import com.example.leszek.simpledagger2mvp.presentation.users.adapter.UsersListAdapter;
 import com.example.leszek.simpledagger2mvp.presentation.users.di.DaggerUsersComponent;
+import com.example.leszek.simpledagger2mvp.presentation.users.di.UsersComponent;
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.example.leszek.simpledagger2mvp.common.BundleKey.KEY_USER_LOGIN;
 
-public class UsersActivity extends AppCompatActivity implements UsersView, EndlessRecyclerOnScrollListener.OnLoadMoreListener {
+public class UsersActivity extends BaseActivity<UsersPresenter> implements UsersView, EndlessRecyclerOnScrollListener.OnLoadMoreListener {
 
     @Inject
     UsersPresenter presenter;
@@ -53,16 +49,14 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
     private boolean progressBarHidden;
     private EndlessRecyclerOnScrollListener endlessScrollListener;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ApplicationComponent applicationComponent = ((SimpleDagger2MvpApplication) getApplication()).getApplicationComponent();
-        DaggerUsersComponent.builder()
-                .applicationComponent(applicationComponent)
-                .build()
-                .injectTo(this);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+    protected int layoutResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    public void created() {
         setSupportActionBar(toolbar);
 
         adapter = new UsersListAdapter();
@@ -70,15 +64,12 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         recyclerView.setAdapter(adapter);
         endlessScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(), this);
         recyclerView.addOnScrollListener(endlessScrollListener);
-
-        presenter.attachView(new WeakReference<>(this).get());
-
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.detachView();
+    protected void inject() {
+        presenterComponent = DaggerUsersComponent.builder().applicationComponent(getApplicationComponent()).build();
+        ((UsersComponent) presenterComponent).injectTo(this);
     }
 
 
@@ -142,11 +133,11 @@ public class UsersActivity extends AppCompatActivity implements UsersView, Endle
         presenter.loadMore();
     }
 
+
     @Override
     public void showErrorMessage() {
         Snackbar.make(coordinatorLayout, R.string.error_message, Snackbar.LENGTH_LONG).show();
     }
-
 
     @Override
     public void setUsers(List<UserModel> users) {
