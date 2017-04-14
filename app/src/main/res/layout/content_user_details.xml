@@ -209,7 +209,7 @@
             android:id="@+id/userdetails_location_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="32dp"
+            android:paddingTop="56dp"
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:visibility="invisible">

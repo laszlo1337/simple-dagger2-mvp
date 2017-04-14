@@ -30,8 +30,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -150,7 +155,15 @@ public class UserDetailsActivity extends AppCompatActivity implements UserDetail
             setVisible(companyView);
             company.setText(ud.getCompany());
         }
-        dateJoined.setText(ud.getCreatedAt());
+        //date conversion
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = dateFormat.parse(ud.getCreatedAt().substring(0,9));
+            dateJoined.setText(new SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(date));
+        } catch (ParseException e) {
+            dateJoined.setText(ud.getCreatedAt());
+            e.printStackTrace();
+        }
         followers.setText(String.valueOf(ud.getFollowers()));
         gitProfile.setOnClickListener(v -> {
             Intent newIntent = new Intent(Intent.ACTION_VIEW,
@@ -185,15 +198,17 @@ public class UserDetailsActivity extends AppCompatActivity implements UserDetail
             try {
                 address = geocoder.getFromLocationName(cityName, 1);
             } catch (IOException e) {
+                locationView.setVisibility(View.INVISIBLE);
                 e.printStackTrace();
-                locationView.setVisibility(View.GONE);
             }
-            Address a = address.get(0);
-            LatLng location = new LatLng(a.getLatitude(), a.getLongitude());
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
-                    .title(cityName).icon(icon).anchor(0.5f,0));
-            marker.showInfoWindow();
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+            if(!address.isEmpty()) {
+                Address a = address.get(0);
+                LatLng location = new LatLng(a.getLatitude(), a.getLongitude());
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
+                        .title(cityName).icon(icon).anchor(0.5f, 0));
+                marker.showInfoWindow();
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+            }
         }
     }
 
